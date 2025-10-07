@@ -1,14 +1,23 @@
-import { Application, Graphics, Text, Assets, Container } from 'pixi.js'
-import { createState, tick, clickCut, useCrowbar, gambleHigherTier, cyclePerk, spawnIfNeeded, lockOrUnlock } from '@/src/game/state.js'
+import { Application, Graphics, Text, Assets, Container } from "pixi.js"
+import {
+  createState,
+  tick,
+  clickCut,
+  useCrowbar,
+  gambleHigherTier,
+  cyclePerk,
+  spawnIfNeeded,
+  lockOrUnlock,
+} from "@/src/game/state.js"
 
 export async function startGame() {
   const app = new Application()
-  await app.init({ background: '#0f0f14', resizeTo: window })
+  await app.init({ background: "#0f0f14", resizeTo: window })
   document.body.appendChild(app.canvas)
 
   // Ensure font is available
-  let base = '.'
-  if (import.meta.env.DEV) base = '../..'
+  let base = "."
+  if (import.meta.env.DEV) base = "../.."
   try {
     await Assets.load(`${base}/assets/fonts/OpenSans-Medium.ttf`)
   } catch (e) {
@@ -22,17 +31,26 @@ export async function startGame() {
   const ui = { hitTimer: 0, particles: [] }
 
   // UI Elements
-  const title = new Text({ text: 'Arenjie', style: { fill: '#FFD166', fontFamily: 'OpenSans Medium', fontSize: 36 } })
+  const title = new Text({
+    text: "Arenjie",
+    style: { fill: "#FFD166", fontFamily: "OpenSans Medium", fontSize: 36 },
+  })
   title.x = 20
   title.y = 14
   app.stage.addChild(title)
 
-  const info = new Text({ text: '', style: { fill: '#FFFFFF', fontFamily: 'OpenSans Medium', fontSize: 16 } })
+  const info = new Text({
+    text: "",
+    style: { fill: "#FFFFFF", fontFamily: "OpenSans Medium", fontSize: 16 },
+  })
   info.x = 20
   info.y = 60
   app.stage.addChild(info)
 
-  const message = new Text({ text: state.message, style: { fill: '#AAAAAA', fontFamily: 'OpenSans Medium', fontSize: 14 } })
+  const message = new Text({
+    text: state.message,
+    style: { fill: "#AAAAAA", fontFamily: "OpenSans Medium", fontSize: 14 },
+  })
   message.x = 20
   message.y = 84
   app.stage.addChild(message)
@@ -41,14 +59,17 @@ export async function startGame() {
   const boxC = new Container()
   app.stage.addChild(boxC)
   const boxG = new Graphics()
-  const boxLabel = new Text({ text: '', style: { fill: '#FFFFFF', fontFamily: 'OpenSans Medium', fontSize: 18 } })
+  const boxLabel = new Text({
+    text: "",
+    style: { fill: "#FFFFFF", fontFamily: "OpenSans Medium", fontSize: 18 },
+  })
   const lockG = new Graphics()
   boxC.addChild(boxG)
   boxC.addChild(boxLabel)
   boxC.addChild(lockG)
-  boxC.eventMode = 'static'
-  boxC.cursor = 'pointer'
-  boxC.on('pointerdown', () => {
+  boxC.eventMode = "static"
+  boxC.cursor = "pointer"
+  boxC.on("pointerdown", () => {
     ui.hitTimer = 0.12
     clickCut(state)
   })
@@ -67,26 +88,32 @@ export async function startGame() {
   const makeButton = (label, x, y, onClick) => {
     const g = new Graphics()
     g.roundRect(x, y, 150, 40, 6).fill(0x273142)
-    const t = new Text({ text: label, style: { fill: '#FFFFFF', fontFamily: 'OpenSans Medium', fontSize: 16 } })
+    const t = new Text({
+      text: label,
+      style: { fill: "#FFFFFF", fontFamily: "OpenSans Medium", fontSize: 16 },
+    })
     t.x = x + 12
     t.y = y + 10
     const container = new Graphics()
     container.addChild(g)
     container.addChild(t)
-    container.eventMode = 'static'
-    container.on('pointerdown', onClick)
+    container.eventMode = "static"
+    container.on("pointerdown", onClick)
     app.stage.addChild(container)
     return container
   }
 
-  makeButton('Cut [Space]', 20, 120, () => { ui.hitTimer = 0.12; clickCut(state) })
-  makeButton('Force Open', 190, 120, () => useCrowbar(state))
-  makeButton('Gamble T+', 360, 120, () => gambleHigherTier(state))
-  makeButton('Cycle Perk', 530, 120, () => cyclePerk(state))
+  makeButton("Cut [Space]", 20, 120, () => {
+    ui.hitTimer = 0.12
+    clickCut(state)
+  })
+  makeButton("Force Open", 190, 120, () => useCrowbar(state))
+  makeButton("Gamble T+", 360, 120, () => gambleHigherTier(state))
+  makeButton("Cycle Perk", 530, 120, () => cyclePerk(state))
 
   // Keyboard
-  window.addEventListener('keydown', (e) => {
-    if (e.code === 'Space') {
+  window.addEventListener("keydown", (e) => {
+    if (e.code === "Space") {
       e.preventDefault()
       ui.hitTimer = 0.12
       clickCut(state)
@@ -101,9 +128,9 @@ export async function startGame() {
     const currency = state.currency
     const stats = state.stats
     const boxText = box
-      ? `Box T${box.tier}${box.locked ? ' [LOCKED]' : ''}  HP: ${Math.ceil(box.hp)}/${box.maxHp}`
-      : 'No box. (Click Gamble)'
-    info.text = `${boxText}    Scrap: ${currency}    Tools: ${tools.map((t) => `${t.name}(${t.durability})`).join(', ') || '—'}    Perk: ${perkName}    Opened: ${stats.opened}`
+      ? `Box T${box.tier}${box.locked ? " [LOCKED]" : ""}  HP: ${Math.ceil(box.hp)}/${box.maxHp}`
+      : "No box. (Click Gamble)"
+    info.text = `${boxText}    Scrap: ${currency}    Tools: ${tools.map((t) => `${t.name}(${t.durability})`).join(", ") || "—"}    Perk: ${perkName}    Opened: ${stats.opened}`
     message.text = state.message
 
     // Box graphics (centered)
@@ -129,7 +156,9 @@ export async function startGame() {
       const oy = -bh / 2
       boxG.roundRect(ox, oy, bw, bh, 12).fill(color)
       // inner highlight
-      boxG.roundRect(ox + 6, oy + 6, bw - 12, bh - 12, 8).stroke({ color: 0x000000, width: 2, alignment: 0 })
+      boxG
+        .roundRect(ox + 6, oy + 6, bw - 12, bh - 12, 8)
+        .stroke({ color: 0x000000, width: 2, alignment: 0 })
       boxLabel.text = box.locked ? `T${box.tier} LOCKED` : `T${box.tier} BOX`
       boxLabel.x = -boxLabel.width / 2
       boxLabel.y = -boxLabel.height / 2
@@ -170,14 +199,14 @@ export async function startGame() {
     if (ui.hitTimer > 0) {
       ui.hitTimer = Math.max(0, ui.hitTimer - 1 / 60)
     }
-    const bump = ui.hitTimer > 0 ? (ui.hitTimer / 0.12) : 0
+    const bump = ui.hitTimer > 0 ? ui.hitTimer / 0.12 : 0
     const scale = 1 + 0.06 * bump
     boxC.scale.set(scale, scale)
 
     // FX particles render
     fxG.clear()
-    ui.particles = ui.particles.filter(p => p.life > 0)
-    ui.particles.forEach(p => {
+    ui.particles = ui.particles.filter((p) => p.life > 0)
+    ui.particles.forEach((p) => {
       p.life -= 1 / 60
       p.x += p.vx
       p.y += p.vy
@@ -200,11 +229,18 @@ export async function startGame() {
       const viewH = app.renderer.height
       const cx = ui.boxCenterX ?? viewW / 2
       const cy = ui.boxCenterY ?? viewH / 2
-      const color = evt.type === 'destroyed' ? 0xef476f : 0x06d6a0
+      const color = evt.type === "destroyed" ? 0xef476f : 0x06d6a0
       for (let i = 0; i < 24; i++) {
         const ang = Math.random() * Math.PI * 2
         const spd = 2 + Math.random() * 3
-        ui.particles.push({ x: cx, y: cy, vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd - 2, life: 0.6 + Math.random() * 0.4, color })
+        ui.particles.push({
+          x: cx,
+          y: cy,
+          vx: Math.cos(ang) * spd,
+          vy: Math.sin(ang) * spd - 2,
+          life: 0.6 + Math.random() * 0.4,
+          color,
+        })
       }
     }
   })

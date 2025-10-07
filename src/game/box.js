@@ -42,10 +42,12 @@ export function rollRewards(box) {
   const scrap = randRange(def.reward.scrap)
   // Simple loot table
   const drops = []
-  if (Math.random() < 0.15) drops.push({ type: 'tool', name: 'Crowbar', durability: 5 })
-  if (Math.random() < 0.10) drops.push({ type: 'perk', key: 'sharp_blade' })
-  if (Math.random() < 0.05) drops.push({ type: 'perk', key: 'careful_hands' })
-  if (Math.random() < 0.10) drops.push({ type: 'code', code: `code-t${box.tier + 1}` })
+  if (Math.random() < 0.15)
+    drops.push({ type: "tool", name: "Crowbar", durability: 5 })
+  if (Math.random() < 0.1) drops.push({ type: "perk", key: "sharp_blade" })
+  if (Math.random() < 0.05) drops.push({ type: "perk", key: "careful_hands" })
+  if (Math.random() < 0.1)
+    drops.push({ type: "code", code: `code-t${box.tier + 1}` })
   // Boxes within boxes
   const nested = Math.random() < 0.12 ? 1 + (Math.random() < 0.3 ? 1 : 0) : 0
   return { scrap, drops, nested }
@@ -54,9 +56,13 @@ export function rollRewards(box) {
 export function applyCodeIfAvailable(box, inventoryCodes) {
   if (!box.locked || !box.requiresCode) return { box, used: false }
   if (inventoryCodes.has(box.requiresCode)) {
-    const unlocked = { ...box, locked: false, requiresCode: null, hp: Math.max(1, Math.round(box.hp * 0.5)) }
+    const unlocked = {
+      ...box,
+      locked: false,
+      requiresCode: null,
+      hp: Math.max(1, Math.round(box.hp * 0.5)),
+    }
     return { box: unlocked, used: true }
   }
   return { box, used: false }
 }
-

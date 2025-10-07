@@ -8,9 +8,8 @@ import {
 } from "pixi.js"
 import atlasData from "@/assets/spritesheets/pieces-spritesheet.json"
 
-let base = '.'
-if (import.meta.env.DEV)
-  base = '../..'
+let base = "."
+if (import.meta.env.DEV) base = "../.."
 
 const load = async () => {
   return Promise.all([

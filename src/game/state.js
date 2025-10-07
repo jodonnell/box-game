@@ -1,26 +1,26 @@
-import { applyCodeIfAvailable, makeBox, rollRewards } from './box.js'
-import { resolvePerk } from './perks.js'
+import { applyCodeIfAvailable, makeBox, rollRewards } from "./box.js"
+import { resolvePerk } from "./perks.js"
 
 export function createState() {
   const first = makeBox(1)
   return {
-    title: 'Arenjie',
+    title: "Arenjie",
     currency: 0, // scrap
     boxesQueue: [first],
     current: first,
     codes: new Set(),
     tools: [], // { name: 'Crowbar', durability: n }
-    equippedPerk: 'none',
+    equippedPerk: "none",
     passiveDps: 0.5, // hp/sec
     baseCutPower: 4, // per click
-    message: 'Open boxes. Find loot. Profit.',
+    message: "Open boxes. Find loot. Profit.",
     stats: { opened: 0, destroyed: 0, tierMax: 1 },
     lastEvent: null,
   }
 }
 
 export function cyclePerk(state) {
-  const order = ['none', 'sharp_blade', 'careful_hands']
+  const order = ["none", "sharp_blade", "careful_hands"]
   const idx = order.indexOf(state.equippedPerk)
   const next = order[(idx + 1) % order.length]
   state.equippedPerk = next
@@ -56,14 +56,17 @@ export function clickCut(state) {
 }
 
 export function useCrowbar(state) {
-  const toolIdx = state.tools.findIndex((t) => t.name === 'Crowbar' && t.durability > 0)
+  const toolIdx = state.tools.findIndex(
+    (t) => t.name === "Crowbar" && t.durability > 0,
+  )
   if (toolIdx === -1) {
-    state.message = 'No crowbar available.'
+    state.message = "No crowbar available."
     return
   }
   const perk = resolvePerk(state.equippedPerk)
   const breakChance = 0.2 + (perk.mods.breakChanceAdd || 0)
-  const destroyChance = (state.current.fragileChance || 0.1) * (perk.mods.destroyChanceMul || 1)
+  const destroyChance =
+    (state.current.fragileChance || 0.1) * (perk.mods.destroyChanceMul || 1)
 
   // Force attempt: either open instantly or destroy contents
   const destroyed = Math.random() < destroyChance
@@ -73,8 +76,8 @@ export function useCrowbar(state) {
   if (destroyed) {
     // Box breaks, nothing inside
     state.stats.destroyed += 1
-    state.message = 'Oops. Box destroyed. Nothing inside.'
-    state.lastEvent = { type: 'destroyed', tier: state.current?.tier }
+    state.message = "Oops. Box destroyed. Nothing inside."
+    state.lastEvent = { type: "destroyed", tier: state.current?.tier }
     nextBox(state)
     return
   }
@@ -126,17 +129,19 @@ export function openCurrentBox(state) {
   const rewards = rollRewards(box)
   state.currency += rewards.scrap
   rewards.drops.forEach((d) => {
-    if (d.type === 'tool') state.tools.push({ name: d.name, durability: d.durability })
-    if (d.type === 'perk') state.equippedPerk = d.key
-    if (d.type === 'code') state.codes.add(d.code)
+    if (d.type === "tool")
+      state.tools.push({ name: d.name, durability: d.durability })
+    if (d.type === "perk") state.equippedPerk = d.key
+    if (d.type === "code") state.codes.add(d.code)
   })
   if (rewards.nested > 0) {
-    for (let i = 0; i < rewards.nested; i++) state.boxesQueue.unshift(makeBox(box.tier))
+    for (let i = 0; i < rewards.nested; i++)
+      state.boxesQueue.unshift(makeBox(box.tier))
   }
   state.stats.opened += 1
   state.stats.tierMax = Math.max(state.stats.tierMax, box.tier)
-  state.message = `Opened T${box.tier}. +${rewards.scrap} scrap${rewards.drops.length ? ' + loot!' : ''}`
-  state.lastEvent = { type: 'opened', tier: box.tier }
+  state.message = `Opened T${box.tier}. +${rewards.scrap} scrap${rewards.drops.length ? " + loot!" : ""}`
+  state.lastEvent = { type: "opened", tier: box.tier }
   state.current = null
   spawnIfNeeded(state)
 }
