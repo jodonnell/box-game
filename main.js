@@ -1,4 +1,4 @@
 import "./style.css"
-import { test } from "./src/draw/test.js"
+import { startGame } from "@/src/ui/pixiScene.js"
 
-test()
+startGame()
